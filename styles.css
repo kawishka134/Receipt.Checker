@@ -1,0 +1,40 @@
+// Function to load receipt numbers from local storage
+function loadReceipts() {
+    const receipts = JSON.parse(localStorage.getItem('receipts')) || [];
+    const listElement = document.getElementById('receiptList');
+    listElement.innerHTML = ''; // Clear existing list
+
+    receipts.forEach(receipt => {
+        const li = document.createElement('li');
+        li.textContent = receipt;
+        listElement.appendChild(li);
+    });
+}
+
+// Function to add a receipt number
+function addReceipt() {
+    const inputElement = document.getElementById('receiptNumber');
+    const receiptNumber = inputElement.value.trim();
+    const receipts = JSON.parse(localStorage.getItem('receipts')) || [];
+
+    if (receiptNumber === "") {
+        alert("Please enter a receipt number.");
+        return;
+    }
+
+    if (receipts.includes(receiptNumber)) {
+        alert("This receipt number has already been added.");
+        return;
+    }
+
+    receipts.push(receiptNumber);
+    localStorage.setItem('receipts', JSON.stringify(receipts));
+    inputElement.value = ''; // Clear input field
+    loadReceipts(); // Reload receipts
+}
+
+// Event listener for button click
+document.getElementById('addButton').addEventListener('click', addReceipt);
+
+// Load receipts when the page loads
+window.onload = loadReceipts;

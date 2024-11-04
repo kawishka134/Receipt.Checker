@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Receipt Checker</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastify-js/1.12.0/toastify.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+            padding: 2rem;
+            color: #e2e8f0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #2d3748;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        h1 {
+            color: #fff;
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .input-group {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        input {
+            flex: 1;
+            padding: 1rem;
+            border: 2px solid #4a5568;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #1a202c;
+            color: #fff;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #4299e1;
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
+        }
+
+        input::placeholder {
+            color: #718096;
+        }
+
+        button {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 10px;
+            background: #4299e1;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        button:hover {
+            background: #3182ce;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(66, 153, 225, 0.3);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .button-secondary {
+            background: #4a5568;
+            color: #fff;
+        }
+
+        .button-secondary:hover {
+            background: #2d3748;
+        }
+
+        .button-danger {
+            background: #e53e3e;
+        }
+
+        .button-danger:hover {
+            background: #c53030;
+        }
+
+        #receiptList {
+            background: #1a202c;
+            border-radius: 10px;
+            padding: 1.5rem;
+            min-height: 200px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        #receiptList div {
+            padding: 1rem;
+            background: #2d3748;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            animation: slideIn 0.3s ease;
+            color: #48bb78;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #718096;
+            padding: 2rem;
+        }
+
+        /* Custom Notification Styles */
+        .toastify {
+            background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 1rem 1.5rem;
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .toastify.success {
+            background: linear-gradient(135deg, #2f855a 0%, #276749 100%);
+        }
+
+        .toastify.error {
+            background: linear-gradient(135deg, #c53030 0%, #9b2c2c 100%);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Receipt Checker</h1>
+        
+        <div class="input-group">
+            <input type="text" id="receiptInput" placeholder="Enter receipt number..." />
+            <button onclick="saveReceiptNumber(document.getElementById('receiptInput').value)">Check Receipt</button>
+        </div>
+
+        <div class="button-group">
+            <button class="button-secondary" onclick="loadReceiptNumbers()">Load History</button>
+            <button class="button-danger" onclick="clearReceiptNumbers()">Clear All</button>
+        </div>
+
+        <div id="receiptList">
+            <div class="empty-state">No receipts checked yet. Enter a receipt number above.</div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastify-js/1.12.0/toastify.js"></script>
+    <script>
+        function showNotification(message, type = 'success') {
+            Toastify({
+                text: message,
+                duration: 3000,
+                gravity: "top",
+                position: "right",
+                className: type,
+                stopOnFocus: true,
+            }).showToast();
+        }
+
+        function saveReceiptNumber(receiptNumber) {
+            if (!receiptNumber.trim()) {
+                showNotification('Please enter a receipt number', 'error');
+                return;
+            }
+            
+            let receiptNumbers = JSON.parse(localStorage.getItem('receiptNumbers')) || [];
+            if (!receiptNumbers.includes(receiptNumber)) {
+                receiptNumbers.push(receiptNumber);
+                localStorage.setItem('receiptNumbers', JSON.stringify(receiptNumbers));
+                document.getElementById('receiptInput').value = '';
+                loadReceiptNumbers();
+                showNotification('✓ Receipt verified and saved successfully!', 'success');
+            } else {
+                showNotification('This receipt has already been checked!', 'error');
+            }
+        }
+
+        function loadReceiptNumbers() {
+            let receiptNumbers = JSON.parse(localStorage.getItem('receiptNumbers')) || [];
+            const receiptList = document.getElementById('receiptList');
+            
+            if (receiptNumbers.length === 0) {
+                receiptList.innerHTML = '<div class="empty-state">No receipts checked yet. Enter a receipt number above.</div>';
+                return;
+            }
+            
+            receiptList.innerHTML = '';
+            receiptNumbers.forEach(number => {
+                const listItem = document.createElement('div');
+                listItem.textContent = `✓ ${number}`;
+                receiptList.appendChild(listItem);
+            });
+        }
+
+        function clearReceiptNumbers() {
+            if (confirm('Are you sure you want to clear all receipt history?')) {
+                localStorage.removeItem('receiptNumbers');
+                loadReceiptNumbers();
+                showNotification('All receipt history cleared', 'success');
+            }
+        }
+
+        // Load receipts on page load
+        window.onload = loadReceiptNumbers;
+
+        // Add enter key support
+        document.getElementById('receiptInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                saveReceiptNumber(this.value);
+            }
+        });
+    </script>
+</body>
+</html>

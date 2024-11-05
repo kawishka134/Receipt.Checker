@@ -68,11 +68,11 @@
             padding: 1rem;
             border: 2px solid #4a5568;
             border-radius: 10px;
-            font-size: 16px; /* Prevent iOS zoom */
+            font-size: 16px;
             transition: all 0.3s ease;
             background: #1a202c;
             color: #fff;
-            -webkit-appearance: none; /* Remove iOS default styles */
+            -webkit-appearance: none;
         }
 
         input:focus {
@@ -190,7 +190,6 @@
             font-size: 0.9rem;
         }
 
-        /* Custom Notification Styles */
         .toastify {
             background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -209,7 +208,6 @@
             background: linear-gradient(135deg, #c53030 0%, #9b2c2c 100%);
         }
 
-        /* Safe area padding for notched phones */
         @supports(padding: max(0px)) {
             body {
                 padding-left: max(1rem, env(safe-area-inset-left));
@@ -219,7 +217,6 @@
             }
         }
 
-        /* Adjust toast position on mobile */
         @media (max-width: 640px) {
             .toastify {
                 margin: 0.5rem;
@@ -243,81 +240,14 @@
             <button class="button-danger" onclick="clearReceiptNumbers()">Clear All</button>
         </div>
 
+        <div id="countDisplay">Total Receipts: 0</div>
+
         <div id="receiptList">
             <div class="empty-state">No receipts checked yet. Enter a receipt number above.</div>
         </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastify-js/1.12.0/toastify.js"></script>
-    <script>
-        function showNotification(message, type = 'success') {
-            Toastify({
-                text: message,
-                duration: 3000,
-                gravity: "top",
-                position: window.innerWidth <= 640 ? "center" : "right",
-                className: type,
-                stopOnFocus: true,
-            }).showToast();
-        }
-
-        function saveReceiptNumber(receiptNumber) {
-            if (!receiptNumber.trim()) {
-                showNotification('Please enter a receipt number', 'error');
-                return;
-            }
-            
-            let receiptNumbers = JSON.parse(localStorage.getItem('receiptNumbers')) || [];
-            if (!receiptNumbers.includes(receiptNumber)) {
-                receiptNumbers.push(receiptNumber);
-                localStorage.setItem('receiptNumbers', JSON.stringify(receiptNumbers));
-                document.getElementById('receiptInput').value = '';
-                loadReceiptNumbers();
-                showNotification('✓ Receipt verified and saved successfully!', 'success');
-            } else {
-                showNotification('This receipt has already been checked!', 'error');
-            }
-        }
-
-        function loadReceiptNumbers() {
-            let receiptNumbers = JSON.parse(localStorage.getItem('receiptNumbers')) || [];
-            const receiptList = document.getElementById('receiptList');
-            
-            if (receiptNumbers.length === 0) {
-                receiptList.innerHTML = '<div class="empty-state">No receipts checked yet. Enter a receipt number above.</div>';
-                return;
-            }
-            
-            receiptList.innerHTML = '';
-            receiptNumbers.forEach(number => {
-                const listItem = document.createElement('div');
-                listItem.textContent = `✓ ${number}`;
-                receiptList.appendChild(listItem);
-            });
-        }
-
-        function clearReceiptNumbers() {
-            if (confirm('Are you sure you want to clear all receipt history?')) {
-                localStorage.removeItem('receiptNumbers');
-                loadReceiptNumbers();
-                showNotification('All receipt history cleared', 'success');
-            }
-        }
-
-        // Load receipts on page load
-        window.onload = loadReceiptNumbers;
-
-        // Add enter key support
-        document.getElementById('receiptInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                saveReceiptNumber(this.value);
-            }
-        });
-
-        // Prevent zoom on iOS when focusing input
-        document.addEventListener('gesturestart', function(e) {
-            e.preventDefault();
-        });
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>

@@ -1,29 +1,218 @@
-// Receipt number එක local storage එකට save කිරීම
-function saveReceiptNumber(receiptNumber) {
-    let receiptNumbers = JSON.parse(localStorage.getItem('receiptNumbers')) || []; // දැනට ඇති receipt numbers ලබා ගන්න
-    if (!receiptNumbers.includes(receiptNumber)) { // duplicate check
-        receiptNumbers.push(receiptNumber); // නව receipt number එක එක් කරන්න
-        localStorage.setItem('receiptNumbers', JSON.stringify(receiptNumbers)); // local storage එකට save කරන්න
-        alert('Receipt number saved!');
-    } else {
-        alert('This receipt number is already saved!'); // duplicate message
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+    background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+    padding: 1rem;
+    color: #e2e8f0;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Fix for iOS height */
+html {
+    height: -webkit-fill-available;
+}
+
+.container {
+    max-width: 800px;
+    width: 100%;
+    margin: 0 auto;
+    background: #2d3748;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    padding: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    flex: 1;
+}
+
+h1 {
+    color: #fff;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    font-size: clamp(1.5rem, 5vw, 2.5rem);
+    font-weight: 700;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.input-group {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    flex-direction: column;
+}
+
+@media (min-width: 640px) {
+    .input-group {
+        flex-direction: row;
     }
 }
 
-// Local storage එකෙන් receipt numbers ලබා ගන්න
-function loadReceiptNumbers() {
-    let receiptNumbers = JSON.parse(localStorage.getItem('receiptNumbers')) || []; // local storage එකෙන් data ලබා ගන්න
-    const receiptList = document.getElementById('receiptList');
-    receiptList.innerHTML = ''; // පරණ ලැයිස්තුව ආපසු නැවත ගන්න
-    receiptNumbers.forEach(number => {
-        const listItem = document.createElement('div'); // එකක් එක් කරන්න
-        listItem.textContent = number; // receipt number එක text ලෙස යෙදීම
-        receiptList.appendChild(listItem); // list එකට එකතු කරන්න
-    });
+input {
+    width: 100%;
+    padding: 1rem;
+    border: 2px solid #4a5568;
+    border-radius: 10px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    background: #1a202c;
+    color: #fff;
+    -webkit-appearance: none;
 }
 
-// Local storage එකෙන් receipt numbers මැකීම
-function clearReceiptNumbers() {
-    localStorage.removeItem('receiptNumbers'); // local storage එකෙන් data එක මකන්න
-    alert('All receipt numbers cleared!');
+input:focus {
+    outline: none;
+    border-color: #4299e1;
+    box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
+}
+
+input::placeholder {
+    color: #718096;
+}
+
+button {
+    padding: 1rem;
+    border: none;
+    border-radius: 10px;
+    background: #4299e1;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    width: 100%;
+    touch-action: manipulation;
+    -webkit-appearance: none;
+}
+
+@media (min-width: 640px) {
+    button {
+        width: auto;
+        padding: 1rem 2rem;
+    }
+
+    .input-group button {
+        white-space: nowrap;
+    }
+}
+
+button:active {
+    transform: translateY(1px);
+}
+
+button:hover {
+    background: #3182ce;
+    box-shadow: 0 4px 12px rgba(66, 153, 225, 0.3);
+}
+
+.button-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.button-secondary {
+    background: #4a5568;
+    color: #fff;
+}
+
+.button-secondary:hover {
+    background: #2d3748;
+}
+
+.button-danger {
+    background: #e53e3e;
+}
+
+.button-danger:hover {
+    background: #c53030;
+}
+
+#receiptList {
+    background: #1a202c;
+    border-radius: 10px;
+    padding: 1rem;
+    min-height: 200px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    max-height: calc(100vh - 300px);
+}
+
+#receiptList div {
+    padding: 1rem;
+    background: #2d3748;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    animation: slideIn 0.3s ease;
+    color: #48bb78;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    word-break: break-all;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.empty-state {
+    text-align: center;
+    color: #718096;
+    padding: 1.5rem;
+    font-size: 0.9rem;
+}
+
+.toastify {
+    background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 1rem 1.5rem;
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    font-size: 0.9rem;
+}
+
+.toastify.success {
+    background: linear-gradient(135deg, #2f855a 0%, #276749 100%);
+}
+
+.toastify.error {
+    background: linear-gradient(135deg, #c53030 0%, #9b2c2c 100%);
+}
+
+@supports(padding: max(0px)) {
+    body {
+        padding-left: max(1rem, env(safe-area-inset-left));
+        padding-right: max(1rem, env(safe-area-inset-right));
+        padding-top: max(1rem, env(safe-area-inset-top));
+        padding-bottom: max(1rem, env(safe-area-inset-bottom));
+    }
+}
+
+@media (max-width: 640px) {
+    .toastify {
+        margin: 0.5rem;
+        width: calc(100% - 1rem) !important;
+        left: 0 !important;
+    }
 }
